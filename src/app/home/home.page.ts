@@ -8,8 +8,8 @@ import { IonInput, PopoverController } from '@ionic/angular';
 })
 export class HomePage {
   selectedSeg: string = 'Grocery';
-  Category :Array<string> = [];
-  metadata: Array<Array<string | number>> = [];
+  Category: Array<string> = ["Grocery", "Dining"];
+  metadata: { [category: string]: { title: string; amount: string }[] } = {};
   @ViewChild('categoryInput')
   categoryInput!: IonInput;
   @ViewChild('titleInput') titleInput!: IonInput;
@@ -34,21 +34,30 @@ export class HomePage {
     }
 
     // Check if title and amount are of type string
-    if (typeof title !== 'string' || typeof amount !== 'string' || typeof category !== 'string') {
+    if (
+      typeof title !== 'string' ||
+      typeof amount !== 'string' ||
+      typeof category !== 'string'
+    ) {
       // Handle the case where title or amount is not a string
       console.log('Title or amount is not a string.');
       return;
     }
 
-    // Check if the category already exists in the category array
+    // if (!this.Category.includes(category)) {
+    //   this.Category.push(category);
+    // }
+    
+    if (!(category in this.metadata)) {
+      this.metadata[category] = [];
+    }
+    this.metadata[category].push({ title, amount });
+    // Check if the category is not already in the Category array
   if (!this.Category.includes(category)) {
-    // If it doesn't exist, add it to the category array
     this.Category.push(category);
   }
 
-    this.metadata.push([category, title, amount]);
-
-    console.log('Updated Metadata:', this.metadata);
+  console.log('Updated Metadata:', this.metadata);
     this.popover.dismiss();
   }
 }
