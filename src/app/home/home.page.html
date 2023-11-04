@@ -1,7 +1,7 @@
 <div class="main-container">
   <ion-card class="TotalSpendingCard">
     <ion-card-header>
-      <ion-card-title>1673$</ion-card-title>
+      <ion-card-title>{{totalSpend}}$</ion-card-title>
       <ion-card-subtitle>Monthly Spending</ion-card-subtitle>
 
       <!-- edit icon start-->
@@ -56,7 +56,7 @@
       <ion-list *ngIf="selectedSeg">
         <ion-item *ngFor="let item of metadata[selectedSeg]">
           <ion-label>{{ item.title }}</ion-label>
-          <ion-note slot="end" color="secondary">{{ item.amount }} $ </ion-note>
+          <ion-note slot="end" color="dark">{{ item.amount }} $ </ion-note>
         </ion-item>
       </ion-list>
     </ion-card-content>

@@ -7,8 +7,9 @@ import { IonInput, PopoverController } from '@ionic/angular';
   styleUrls: ['home.page.scss'],
 })
 export class HomePage {
-  selectedSeg: string = 'Grocery';
-  Category: Array<string> = ["Grocery", "Dining"];
+  selectedSeg: string = 'grocery';
+  Category: Array<string> = ['Grocery', 'Dining'];
+  totalSpend: number = 0;
   metadata: { [category: string]: { title: string; amount: string }[] } = {};
   @ViewChild('categoryInput')
   categoryInput!: IonInput;
@@ -18,46 +19,74 @@ export class HomePage {
 
   addData() {
     // Get values from Ion inputs
-    const category = this.categoryInput.value;
+    const categoryInput = this.categoryInput.value;
     const title = this.titleInput.value;
-    const amount = this.amountInput.value;
+    const amountInput = this.amountInput.value;
 
-    console.log('Category:', category);
-    console.log('Title:', title);
-    console.log('Amount:', amount);
+    let category =
+      typeof categoryInput === 'string'
+        ? this.capitalizeFirstLetter(categoryInput)
+        : categoryInput;
 
-    // Check if any of the inputs are undefined or null
+    console.log(category, typeof category);
+
     if (category === null || category === undefined) {
-      // Handle the case where category is missing
       console.log('Category is missing.');
       return;
     }
-
-    // Check if title and amount are of type string
-    if (
-      typeof title !== 'string' ||
-      typeof amount !== 'string' ||
-      typeof category !== 'string'
-    ) {
-      // Handle the case where title or amount is not a string
-      console.log('Title or amount is not a string.');
+    if (typeof title !== 'string' || typeof category !== 'string') {
+      console.log('Title or category is not a string.');
       return;
     }
 
-    // if (!this.Category.includes(category)) {
-    //   this.Category.push(category);
-    // }
-    
+    const amountInputStr = amountInput?.toString() || '';
+
+    const isAmountValid = /^\d+$/.test(amountInputStr);
+    if (!isAmountValid) {
+      // Display an alert for non-digit input
+      this.showAlert('Invalid Amount', 'Amount should contain only digits.');
+      return;
+    }
+
+    const amount = amountInputStr;
+
     if (!(category in this.metadata)) {
       this.metadata[category] = [];
     }
     this.metadata[category].push({ title, amount });
-    // Check if the category is not already in the Category array
-  if (!this.Category.includes(category)) {
-    this.Category.push(category);
+
+    if (!this.Category.includes(category)) {
+      this.Category.push(category);
+    }
+
+    console.log('Updated Metadata:', this.metadata);
+    this.calculateTotalSpend();
+    this.popover.dismiss();
   }
 
-  console.log('Updated Metadata:', this.metadata);
-    this.popover.dismiss();
+  calculateTotalSpend() {
+    this.totalSpend = 0;
+    for (const category of this.Category) {
+      if (this.metadata[category]) {
+        for (const item of this.metadata[category]) {
+          this.totalSpend += parseFloat(item.amount);
+        }
+      }
+    }
+  }
+
+  showAlert(title: string, message: string) {
+    const alert = document.createElement('ion-alert');
+    alert.header = title;
+    alert.message = message;
+    alert.buttons = ['OK'];
+
+    document.body.appendChild(alert);
+    return alert.present();
+  }
+
+  capitalizeFirstLetter(input: string) {
+    const trimmedInput = input.trim();
+    return trimmedInput.charAt(0).toUpperCase() + trimmedInput.slice(1);
   }
 }
